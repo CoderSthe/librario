@@ -56,6 +56,7 @@ class Books(Resource):
         books = Librario.query.all()
         return books, 201
 
+
 class Book(Resource):
     @marshal_with(book_fields)
     def get(self, id):
@@ -85,9 +86,27 @@ class Book(Resource):
         book = Librario.query.filter_by(id=id).first()
         if not book:
             abort(404, description="Book not found.")
-        
+
         db.session.delete(book)
         db.session.commit()
         book = Librario.query.all()
 
         return book
+
+
+api.add_resource(Books, "/api/books/")
+api.add_resource(Book, "/api/books/<int:id>")
+
+
+@app.before_request
+def create_table():
+    db.create_all()
+
+
+@app.route("/")
+def home():
+    return f"<h1>Welcome to Librario!</h1>"
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
