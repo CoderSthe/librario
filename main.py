@@ -55,3 +55,39 @@ class Books(Resource):
         db.session.commit()
         books = Librario.query.all()
         return books, 201
+
+class Book(Resource):
+    @marshal_with(book_fields)
+    def get(self, id):
+        book = Librario.query.filter_by(id=id).first()
+        if not book:
+            abort(404, description="Book not found.")
+
+        return book
+
+    @marshal_with(book_fields)
+    def patch(self, id):
+        args = book_args.parse_args()
+        book = Librario.query.filter_by(id=id).first()
+        if not book:
+            abort(404, description="Book not found.")
+
+        book.name = args["name"]
+        book.author = args["author"]
+        book.year = args["year"]
+        book.isbn = args["isbn"]
+        db.session.commit()
+
+        return book
+
+    @marshal_with(book_fields)
+    def delete(self, id):
+        book = Librario.query.filter_by(id=id).first()
+        if not book:
+            abort(404, description="Book not found.")
+        
+        db.session.delete(book)
+        db.session.commit()
+        book = Librario.query.all()
+
+        return book
