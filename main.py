@@ -32,5 +32,26 @@ book_fields = {
     "name": fields.String,
     "author": fields.String,
     "year": fields.Integer,
-    "isbn": fields.Integer
+    "isbn": fields.Integer,
 }
+
+
+class Books(Resource):
+    @marshal_with(book_fields)
+    def get(self):
+        books = Librario.query.all()
+        return books
+
+    @marshal_with(book_fields)
+    def post(self):
+        args = book_args.parse_args()
+        book = Librario(
+            name=args["name"],
+            author=args["author"],
+            year=args["year"],
+            isbn=args["isbn"],
+        )
+        db.session.add(book)
+        db.session.commit()
+        books = Librario.query.all()
+        return books, 201
